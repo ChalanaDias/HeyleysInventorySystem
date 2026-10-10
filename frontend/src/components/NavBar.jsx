@@ -13,7 +13,7 @@ const operationsLinks = [
 
 function NavBar() {
   return (
-    <aside className="sidebar">
+    <aside className="sidebar" id="main-navigation">
       {/* Brand link takes the user back to the dashboard. */}
       <NavLink className="brand" to="/dashboard" aria-label="Hayleys Consumer home">
         <img className="brand-logo" src={hayleysLogo} alt="Hayleys Consumer" />
