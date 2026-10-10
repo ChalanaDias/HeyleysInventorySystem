@@ -1,0 +1,284 @@
+/* Keep the top bar fixed across page scrolling and offset it by the desktop sidebar width. */
+.app-header {
+  display: flex;
+  position: fixed;
+  z-index: 3;
+  top: 0;
+  left: 240px;
+  width: calc(100% - 240px);
+  height: 60px;
+  align-items: center;
+  gap: 0;
+  padding: 0 24px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+/* Shared button styling keeps header actions visually consistent and keyboard-focusable. */
+.header-icon-button {
+  display: grid;
+  position: relative;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  color: #065f46;
+  background: transparent;
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.header-icon-button:hover {
+  color: #064e3b;
+  background: #eef8f3;
+}
+
+.header-icon-button:focus-visible {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+/* Draw the simple interface icons with the same emerald stroke treatment. */
+.header-icon-button svg,
+.header-search svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.header-brand {
+  display: flex;
+  width: 146px;
+  height: 46px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #e4ece7;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.header-brand img {
+  display: block;
+  width: 118px;
+  height: 42px;
+  object-fit: contain;
+}
+
+/* Search expands to use available space while stopping at the prototype's desktop width. */
+.header-search {
+  display: flex;
+  width: 100%;
+  max-width: 544px;
+  height: 34px;
+  flex: 1 1 280px;
+  align-items: center;
+  gap: 10px;
+  margin: 0 auto 0 0;
+  padding: 0 12px;
+  border: 1px solid #d3efe0;
+  border-radius: 12px;
+  color: #065f46;
+  background: #eef8f3;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+/* Clearly indicate keyboard focus without relying on color alone. */
+.header-search:focus-within {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgb(16 185 129 / 15%);
+}
+
+.header-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #022c22;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+}
+
+.header-search input::placeholder {
+  color: rgb(4 120 87 / 70%);
+  opacity: 1;
+}
+
+/* Keep notifications and account controls grouped at the far end of the header. */
+.header-actions {
+  display: flex;
+  height: 56px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.notification-button {
+  margin: 0 2px;
+}
+
+/* Anchor the unread-count badge over the notification bell. */
+.notification-count {
+  position: absolute;
+  top: 0;
+  right: -1px;
+  display: grid;
+  min-width: 18px;
+  height: 18px;
+  place-items: center;
+  padding: 0 4px;
+  border-radius: 10px;
+  color: #fff;
+  background: #f43f5e;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Separate account identity from notifications with a subtle vertical divider. */
+.header-user {
+  display: flex;
+  height: 40px;
+  align-items: center;
+  gap: 12px;
+  padding-left: 8px;
+  border-left: 1px solid rgb(16 185 129 / 25%);
+}
+
+/* Align name, role, and facility as a compact right-aligned identity stack. */
+.header-user-details {
+  display: grid;
+  gap: 2px;
+  text-align: right;
+}
+
+.header-user-details strong {
+  color: #111827;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.header-user-details span {
+  color: #065f46;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.header-user-details small {
+  color: #6b7280;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+/* Reserve a circular photo-sized area until profile uploads are available. */
+.header-avatar-placeholder {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid #34d399;
+  border-radius: 50%;
+  color: #065f46;
+  background: #eef8f3;
+}
+
+.header-avatar-placeholder svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+
+/* The sign-out button is intentionally aligned after the profile placeholder. */
+.sign-out-button {
+  margin-left: 0;
+}
+
+/* Reduce spacing and type sizes on tablets while retaining all header information. */
+@media (max-width: 900px) {
+  .app-header {
+    padding: 0 16px;
+  }
+
+  .header-actions {
+    gap: 8px;
+  }
+
+  .header-user {
+    gap: 7px;
+    padding-left: 8px;
+  }
+
+  .header-user-details strong {
+    font-size: 12px;
+  }
+
+  .header-user-details span,
+  .header-user-details small {
+    font-size: 10px;
+  }
+}
+
+/* Match the compact sidebar offset on mobile; hide secondary identity text and sign-out
+   to preserve room for search, notifications, and the profile placeholder. */
+@media (max-width: 700px) {
+  .app-header {
+    left: 64px;
+    width: calc(100% - 64px);
+    height: 68px;
+    gap: 7px;
+    padding: 0 8px;
+  }
+
+  .header-search {
+    min-width: 72px;
+    height: 40px;
+    flex-basis: 72px;
+    gap: 7px;
+    padding: 0 8px;
+  }
+
+  .header-search svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .header-search input {
+    font-size: 12px;
+  }
+
+  .header-actions {
+    gap: 3px;
+  }
+
+  .header-user {
+    height: 36px;
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .header-user-details,
+  .sign-out-button {
+    display: none;
+  }
+
+  .header-avatar-placeholder {
+    width: 30px;
+    height: 30px;
+  }
+}
