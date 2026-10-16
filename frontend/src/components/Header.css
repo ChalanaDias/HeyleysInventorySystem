@@ -4,9 +4,9 @@
   position: fixed;
   z-index: 3;
   top: 0;
-  left: 240px;
-  width: calc(100% - 240px);
-  height: 60px;
+  left: 260px;
+  width: calc(100% - 260px);
+  height: 68px;
   align-items: center;
   gap: 0;
   padding: 0 24px;
@@ -280,5 +280,73 @@
   .header-avatar-placeholder {
     width: 30px;
     height: 30px;
+  }
+}
+
+/* Match the prototype's enlarged desktop header at wide viewport sizes. */
+@media (min-width: 1600px) {
+  .app-header {
+    left: 325px;
+    width: calc(100% - 325px);
+    height: 85px;
+    padding-right: 30px;
+    padding-left: 30px;
+  }
+
+  .header-icon-button {
+    width: 45px;
+    height: 45px;
+  }
+
+  .header-icon-button svg,
+  .header-search svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .header-search {
+    max-width: 680px;
+    height: 43px;
+    flex-basis: 350px;
+    gap: 12px;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .header-search input {
+    font-size: 16px;
+  }
+
+  .header-actions {
+    height: 70px;
+    gap: 20px;
+  }
+
+  .header-user {
+    height: 50px;
+    gap: 15px;
+    padding-left: 10px;
+  }
+
+  .header-user-details strong {
+    font-size: 17px;
+  }
+
+  .header-user-details span {
+    font-size: 14px;
+  }
+
+  .header-user-details small {
+    font-size: 13px;
+  }
+
+  .header-avatar-placeholder {
+    width: 43px;
+    height: 43px;
+  }
+
+  .header-avatar-placeholder svg {
+    width: 26px;
+    height: 26px;
   }
 }

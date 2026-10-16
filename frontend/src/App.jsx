@@ -2,34 +2,55 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header.jsx';
 import NavBar from './components/NavBar.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 import Inventory from './pages/Inventory.jsx';
 import Login from './pages/login.jsx';
+
+// Reuse the existing fixed header and navigation on the app pages.
+function AppLayout({ children }) {
+  return (
+    <div className="flex w-full min-h-screen bg-[#f4f8f5]">
+      <Header />
+      <NavBar />
+
+      {/* Match the fixed desktop sidebar; switch to its compact 64px mobile width. */}
+      <main className="app-main flex-1 ml-[260px] max-[700px]:ml-[64px] min-w-0 min-[1600px]:ml-[325px]">
+        {children}
+      </main>
+    </div>
+  );
+}
 
 function App() {
   return (
     <Routes>
-      {/* Default page */}
+      {/* Keep the login page as the initial destination. */}
       <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* Login page without Header or NavBar */}
+      {/* Login uses its own layout and does not show the app navigation. */}
       <Route path="/login" element={<Login />} />
 
-      {/* Inventory page */}
+      {/* Dashboard page reuses the existing Header and NavBar components. */}
       <Route
-        path="/inventory"
+        path="/dashboard"
         element={
-          <div className="flex w-full min-h-screen bg-[#f4f8f5]">
-            <Header />
-            <NavBar />
-
-            <main className="flex-1 ml-[228px] max-[700px]:ml-[64px] min-w-0">
-              <Inventory />
-            </main>
-          </div>
+          <AppLayout>
+            <Dashboard />
+          </AppLayout>
         }
       />
 
-      {/* Unknown pages */}
+      {/* Inventory page uses the same shared app layout. */}
+      <Route
+        path="/inventory"
+        element={
+          <AppLayout>
+            <Inventory />
+          </AppLayout>
+        }
+      />
+
+      {/* Redirect unknown URLs to the login page. */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
