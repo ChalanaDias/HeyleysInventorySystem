@@ -1,0 +1,288 @@
+/* Dim and blur the underlying page while keeping the dialog content crisp. */
+.rma-modal-backdrop {
+  display: flex;
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 20px;
+  background: rgb(5 27 19 / 54%);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+/* Bound dialog size and allow its body to scroll on short viewports. */
+.rma-modal {
+  width: min(100%, 740px);
+  max-height: min(100%, 820px);
+  overflow-y: auto;
+  padding: 30px 30px 0;
+  border: 1px solid #d9eae1;
+  border-radius: 15px;
+  color: #10251d;
+  background: #fff;
+  box-shadow: 0 24px 70px rgb(4 28 19 / 25%);
+}
+
+/* Brand the title area and leave room for the close control. */
+.rma-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e4eee8;
+}
+
+.rma-modal-icon {
+  display: grid;
+  width: 45px;
+  height: 45px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 11px;
+  color: #fff;
+  background: #006241;
+}
+
+.rma-modal-heading {
+  min-width: 0;
+  flex: 1;
+}
+
+.rma-modal-heading h2,
+.rma-modal-heading p {
+  margin: 0;
+}
+
+.rma-modal-heading h2 {
+  color: #10251d;
+  font-size: 22px;
+  font-weight: 720;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+}
+
+.rma-modal-heading p {
+  margin-top: 4px;
+  color: #587d6c;
+  font-size: 14px;
+}
+
+.rma-modal-close {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  color: #587d6c;
+  background: transparent;
+  cursor: pointer;
+}
+
+.rma-modal-close:hover {
+  color: #10251d;
+  background: #effbf4;
+}
+
+/* Present the form fields as paired inputs on desktop. */
+.rma-form-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 19px 18px;
+  padding: 21px 0 20px;
+}
+
+/* Shared field styling keeps labels and controls visually consistent. */
+.rma-field {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  color: #456357;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.rma-field > span {
+  min-height: 16px;
+}
+
+.rma-field b {
+  color: #a31e28;
+}
+
+/* Full-width fields support longer content such as reasons and incident notes. */
+.rma-field-full {
+  grid-column: 1 / -1;
+}
+
+.rma-quantity-field strong {
+  flex: 0 0 auto;
+  color: #e0202b;
+  font-size: 10px;
+  letter-spacing: 0.025em;
+}
+
+.rma-quantity-field > span {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.rma-field input,
+.rma-field select,
+.rma-field textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 45px;
+  padding: 0 14px;
+  border: 1px solid #c9f3dc;
+  border-radius: 10px;
+  outline: none;
+  color: #10251d;
+  background: #effbf4;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 450;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.rma-field textarea {
+  min-height: 76px;
+  padding: 12px 14px;
+  resize: vertical;
+}
+
+.rma-field input:focus,
+.rma-field select:focus,
+.rma-field textarea:focus {
+  border-color: #00845a;
+  box-shadow: 0 0 0 3px rgb(0 132 90 / 12%);
+}
+
+/* Highlight the negative return amount and its matching credit estimate. */
+.rma-field .rma-negative-input,
+.rma-field .rma-credit-input {
+  color: #d40018;
+  font-weight: 700;
+}
+
+.rma-field .rma-credit-input {
+  cursor: default;
+}
+
+/* Submission feedback is a warning because no RMA backend is connected yet. */
+.rma-form-notice {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border: 1px solid #f0d9a3;
+  border-radius: 8px;
+  color: #78530a;
+  background: #fff8e6;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Separate the primary and secondary actions from the form fields. */
+.rma-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  padding: 15px 0 20px;
+  border-top: 1px solid #e4eee8;
+}
+
+.rma-cancel-button,
+.rma-submit-button {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 18px;
+  border: 1px solid #c9f3dc;
+  border-radius: 10px;
+  color: #10251d;
+  background: #effbf4;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.rma-submit-button {
+  min-width: 240px;
+  border-color: #006241;
+  color: #fff;
+  background: #006241;
+}
+
+.rma-cancel-button:hover {
+  background: #e5f5ed;
+}
+
+.rma-submit-button:hover {
+  background: #004f35;
+}
+
+/* Keep keyboard users able to identify the focused interactive control. */
+.rma-modal-close:focus-visible,
+.rma-cancel-button:focus-visible,
+.rma-submit-button:focus-visible {
+  outline: 3px solid rgb(0 132 90 / 35%);
+  outline-offset: 2px;
+}
+
+@media (max-width: 560px) {
+  /* Stack fields and buttons to keep the dialog usable on narrow screens. */
+  .rma-modal-backdrop {
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .rma-modal {
+    max-height: calc(100vh - 20px);
+    padding: 18px 16px 0;
+    border-radius: 12px;
+  }
+
+  .rma-modal-heading h2 {
+    font-size: 17px;
+  }
+
+  .rma-modal-heading p {
+    font-size: 11px;
+  }
+
+  .rma-form-fields {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 17px 0;
+  }
+
+  .rma-field-full {
+    grid-column: auto;
+  }
+
+  .rma-form-footer {
+    gap: 9px;
+  }
+
+  .rma-cancel-button,
+  .rma-submit-button {
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .rma-submit-button {
+    min-width: 0;
+    flex: 1;
+  }
+}

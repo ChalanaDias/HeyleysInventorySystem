@@ -4,6 +4,7 @@ import Header from './components/Header.jsx';
 import NavBar from './components/NavBar.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Inventory from './pages/Inventory.jsx';
+import Returns from './pages/Returns.jsx';
 import Login from './pages/login.jsx';
 
 // Reuse the existing fixed header and navigation on the app pages.
@@ -46,6 +47,16 @@ function App() {
         element={
           <AppLayout>
             <Inventory />
+          </AppLayout>
+        }
+      />
+
+      {/* Returns and RMA tickets share the standard application shell. */}
+      <Route
+        path="/returns"
+        element={
+          <AppLayout>
+            <Returns />
           </AppLayout>
         }
       />
