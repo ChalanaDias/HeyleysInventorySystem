@@ -1,10 +1,15 @@
 
 import { Routes, Route, Navigate } from 'react-router-dom';
+
 import Header from './components/Header.jsx';
 import NavBar from './components/NavBar.jsx';
+
+import Login from './pages/login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Inventory from './pages/Inventory.jsx';
-import Login from './pages/login.jsx';
+import Returns from './pages/Returns.jsx';
+import POSOrderEntry from './pages/POSOrderEntry.jsx';
+import UserRoles from './pages/UserROles.jsx';
 
 // Reuse the existing fixed header and navigation on the app pages.
 function AppLayout({ children }) {
@@ -30,7 +35,7 @@ function App() {
       {/* Login uses its own layout and does not show the app navigation. */}
       <Route path="/login" element={<Login />} />
 
-      {/* Dashboard page reuses the existing Header and NavBar components. */}
+      {/* Dashboard page */}
       <Route
         path="/dashboard"
         element={
@@ -40,12 +45,42 @@ function App() {
         }
       />
 
-      {/* Inventory page uses the same shared app layout. */}
+      {/* Inventory page */}
       <Route
         path="/inventory"
         element={
           <AppLayout>
             <Inventory />
+          </AppLayout>
+        }
+      />
+
+      {/* Returns and RMA tickets page */}
+      <Route
+        path="/returns"
+        element={
+          <AppLayout>
+            <Returns />
+          </AppLayout>
+        }
+      />
+
+      {/* POS Order Entry page */}
+      <Route
+        path="/pos-order-entry"
+        element={
+          <AppLayout>
+            <POSOrderEntry />
+          </AppLayout>
+        }
+      />
+
+      {/* User Roles page */}
+      <Route
+        path="/user-roles"
+        element={
+          <AppLayout>
+            <UserRoles />
           </AppLayout>
         }
       />
