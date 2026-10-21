@@ -7,8 +7,10 @@ import Login from './pages/login.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Inventory from './pages/Inventory.jsx';
 import Returns from './pages/Returns.jsx';
+import PurchaseOrder from './pages/PurchaseOrder.jsx';
 import POSOrderEntry from './pages/POSOrderEntry.jsx';
 import UserRoles from './pages/UserROles.jsx';
+import Settings from './pages/Settings.jsx';
 
 // Reuse the existing fixed header and navigation on the app pages.
 function AppLayout({ children }) {
@@ -54,6 +56,16 @@ function App() {
         }
       />
 
+      {/* Purchase Orders page */}
+      <Route
+        path="/purchase-orders"
+        element={
+          <AppLayout>
+            <PurchaseOrder />
+          </AppLayout>
+        }
+      />
+
       {/* Returns and RMA tickets page */}
       <Route
         path="/returns"
@@ -80,6 +92,16 @@ function App() {
         element={
           <AppLayout>
             <UserRoles />
+          </AppLayout>
+        }
+      />
+
+      {/* Settings page */}
+      <Route
+        path="/settings"
+        element={
+          <AppLayout>
+            <Settings />
           </AppLayout>
         }
       />

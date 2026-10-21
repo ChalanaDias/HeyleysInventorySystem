@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import AddSKU from '../components/forms/AddSKU.jsx';
+import BatchAdjustStock from '../components/forms/BatchAdjustStock.jsx';
 
 const SVG = {
   Search: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>,
@@ -22,88 +24,102 @@ const SVG = {
   Thermometer: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"></path></svg>
 };
 
-const SKUData = [
-  {
-    id: 'SKU-GLT-01',
-    name: 'Gillette Blue 2 Disposable',
-    desc: 'Single Disposable Razor @ Rs. 150',
-    brand: 'Gillette',
-    bin: 'Bay F-01 (Hub A)',
-    avail: 1200,
-    total: 1250,
-    reserved: 50,
-    wholesale: '125.00',
-    retail: '150.00',
-    margin: '+20%',
-    valuation: '150,000.00',
-    health: 'Healthy',
-    minSafe: 300,
-    lot: '#GLT-2401',
-    expiry: 'Aug 20, 2028',
-    status: 'Safe'
-  },
-  {
-    id: 'SKU-GLT-02',
-    name: 'Gillette Blue 2 Disposable Pouches',
-    desc: '5+1 Razor Pouch @ Rs. 750',
-    brand: 'Gillette',
-    bin: 'Bay F-02 (Hub A)',
-    avail: 640,
-    total: 700,
-    reserved: 60,
-    wholesale: '620.00',
-    retail: '750.00',
-    margin: '+21%',
-    valuation: '396,800.00',
-    health: 'Healthy',
-    minSafe: 150,
-    lot: '#GLT-2402',
-    expiry: 'Aug 20, 2028',
-    status: 'Safe'
-  },
-  {
-    id: 'SKU-MPT-01',
-    name: 'MP Crisps Original',
-    desc: 'Potato Crisps 100g @ Rs. 840',
-    brand: 'Mister Potato',
-    bin: 'Bay M-03 (Hub A)',
-    avail: 1150,
-    total: 1250,
-    reserved: 100,
-    wholesale: '700.00',
-    retail: '840.00',
-    margin: '+20%',
-    valuation: '805,000.00',
-    health: 'Healthy',
-    minSafe: 250,
-    lot: '#MPT-2401',
-    expiry: 'Apr 20, 2026',
-    status: 'Safe'
-  },
-  {
-    id: 'SKU-SUN-07',
-    name: 'GA Peanut Butter Creamy',
-    desc: 'Creamy Butter 450g @ Rs. 1,700',
-    brand: 'Sun Up',
-    bin: 'Bay S-07 (Hub A)',
-    avail: 520,
-    total: 580,
-    reserved: 60,
-    wholesale: '1420.00',
-    retail: '1700.00',
-    margin: '+20%',
-    valuation: '738,400.00',
-    health: 'Healthy',
-    minSafe: 110,
-    lot: '#SUN-2407',
-    expiry: 'May 30, 2026',
-    status: 'Safe'
-  }
-];
-
 export default function Inventory() {
+  const [skuData, setSkuData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isBackendConnected, setIsBackendConnected] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedBrand, setSelectedBrand] = useState('All');
+  const [isAddSkuOpen, setIsAddSkuOpen] = useState(false);
+  const [isAdjustOpen, setIsAdjustOpen] = useState(false);
+
+  // Fetch items from backend on component mount
+  useEffect(() => {
+    let isMounted = true;
+    const fetchInventory = async () => {
+      try {
+        setIsLoading(true);
+        // Supports Vite environment variable or defaults to common backend port
+        const apiUrl = import.meta.env?.VITE_API_BASE_URL 
+          ? `${import.meta.env.VITE_API_BASE_URL}/inventory` 
+          : 'http://localhost:5000/api/inventory';
+
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        
+        // If data is an array or has an items array
+        const items = Array.isArray(data) ? data : (data.items || data.data || []);
+        if (isMounted && Array.isArray(items)) {
+          setSkuData(items);
+          setIsBackendConnected(true);
+        }
+      } catch (err) {
+        console.warn('Backend not reachable or error fetching inventory:', err.message);
+        if (isMounted) {
+          setIsBackendConnected(false);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchInventory();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Compute available brand categories dynamically
+  const brandsList = ['All', ...Array.from(new Set(skuData.map((item) => item.brand).filter(Boolean)))];
+
+  // Filter items based on active search input and brand selection
+  const filteredData = skuData.filter((item) => {
+    const matchesBrand = selectedBrand === 'All' || item.brand === selectedBrand;
+    const query = searchTerm.toLowerCase().trim();
+    if (!query) return matchesBrand;
+
+    const matchesSearch =
+      (item.name && item.name.toLowerCase().includes(query)) ||
+      (item.id && item.id.toLowerCase().includes(query)) ||
+      (item.desc && item.desc.toLowerCase().includes(query)) ||
+      (item.bin && item.bin.toLowerCase().includes(query)) ||
+      (item.lot && item.lot.toLowerCase().includes(query)) ||
+      (item.brand && item.brand.toLowerCase().includes(query));
+
+    return matchesBrand && matchesSearch;
+  });
+
+  // Calculate live summary statistics
+  const totalValuation = skuData.reduce((acc, item) => {
+    const rawVal = typeof item.valuation === 'string'
+      ? parseFloat(item.valuation.replace(/,/g, ''))
+      : (Number(item.valuation) || ((item.avail || 0) * (parseFloat(item.wholesale) || 0)));
+    return acc + (isNaN(rawVal) ? 0 : rawVal);
+  }, 0);
+
+  const formattedValuation = totalValuation.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+
+  const lowStockCount = skuData.filter((item) => {
+    const min = item.minSafe ?? 0;
+    const avail = item.avail ?? 0;
+    return (min > 0 && avail <= min) || item.status === 'Critical' || item.health === 'Critical';
+  }).length;
+
+  const quarantinedCount = skuData.filter((item) => 
+    item.status === 'Quarantined' || item.health === 'Quarantined'
+  ).length;
+
   return (
-    <div className="w-full flex flex-col min-h-screen text-[#10251d] font-sans">
+    <div className="w-full flex flex-col min-h-screen text-[#10251d] font-sans pt-[68px]">
       {/* Main Content */}
       <div className="p-6 flex flex-col gap-6">
         
@@ -115,8 +131,14 @@ export default function Inventory() {
                 Hayleys Hub A Master Stock
               </span>
               <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#00c993]"></div>
-                <span className="text-xs text-gray-500 font-medium">Auto-Sync Enabled (10s)</span>
+                <div className={`w-1.5 h-1.5 rounded-full ${isBackendConnected ? 'bg-[#00c993]' : 'bg-amber-400'}`}></div>
+                <span className="text-xs text-gray-500 font-medium">
+                  {isLoading 
+                    ? 'Syncing with backend...' 
+                    : isBackendConnected 
+                      ? 'Live Backend Connected' 
+                      : 'Auto-Sync Enabled (10s)'}
+                </span>
               </div>
             </div>
             <h1 className="text-3xl font-bold text-[#10251d]">Inventory Catalog & SKU Management</h1>
@@ -128,10 +150,16 @@ export default function Inventory() {
             <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50">
               <SVG.ExternalLink /> Export Registry <SVG.ChevronDown />
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#eef7f2] border border-[#bce3d0] rounded-md text-sm font-semibold text-[#0d5236] shadow-sm hover:bg-[#d1f0e4]">
+            <button 
+              onClick={() => setIsAdjustOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#eef7f2] border border-[#bce3d0] rounded-md text-sm font-semibold text-[#0d5236] shadow-sm hover:bg-[#d1f0e4]"
+            >
               <SVG.Filter /> Batch Adjust Stock
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-[#006241] rounded-md text-sm font-semibold text-white shadow-sm hover:bg-[#004e34]">
+            <button 
+              onClick={() => setIsAddSkuOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#006241] rounded-md text-sm font-semibold text-white shadow-sm hover:bg-[#004e34]"
+            >
               <SVG.Plus /> Add New SKU
             </button>
           </div>
@@ -143,7 +171,7 @@ export default function Inventory() {
             <div className="flex flex-col gap-1">
               <span className="text-xs font-bold text-gray-500 tracking-wider uppercase">Total Cataloged</span>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-[#10251d]">254</span>
+                <span className="text-3xl font-extrabold text-[#10251d]">{skuData.length}</span>
                 <span className="text-sm font-medium text-gray-500">SKUs</span>
               </div>
               <div className="flex items-center gap-2 mt-2">
@@ -162,7 +190,7 @@ export default function Inventory() {
               <span className="text-xs font-bold text-gray-500 tracking-wider uppercase">In-Stock Valuation</span>
               <div className="flex flex-col">
                 <span className="text-sm font-bold text-[#10251d]">Rs.</span>
-                <span className="text-3xl font-extrabold text-[#10251d]">1,428,590</span>
+                <span className="text-3xl font-extrabold text-[#10251d]">{formattedValuation}</span>
               </div>
               <div className="flex items-center gap-3 mt-2">
                 <span className="text-xs font-bold bg-[#eef6f1] text-[#00c993] px-2 py-0.5 rounded-full">+3.4% vs last qtr</span>
@@ -178,7 +206,7 @@ export default function Inventory() {
             <div className="flex flex-col gap-1">
               <span className="text-xs font-bold text-gray-500 tracking-wider uppercase">Low Stock Warnings</span>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-[#10251d]">14</span>
+                <span className="text-3xl font-extrabold text-[#10251d]">{lowStockCount}</span>
                 <span className="text-sm font-bold text-red-500">Critical</span>
               </div>
               <div className="flex items-center justify-between mt-2">
@@ -195,7 +223,7 @@ export default function Inventory() {
             <div className="flex flex-col gap-1">
               <span className="text-xs font-bold text-gray-500 tracking-wider uppercase">Quarantined Stock</span>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-extrabold text-[#10251d]">3</span>
+                <span className="text-3xl font-extrabold text-[#10251d]">{quarantinedCount}</span>
                 <span className="text-sm font-medium text-gray-500">Batches</span>
               </div>
               <div className="flex items-center gap-3 mt-2">
@@ -218,6 +246,8 @@ export default function Inventory() {
               </span>
               <input 
                 type="text" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search SKU code, item title, lot # or bin..." 
                 className="w-full bg-[#f8faf9] border border-gray-200 rounded-md py-2 pl-10 pr-24 text-sm focus:outline-none focus:ring-2 focus:ring-[#00c993]"
               />
@@ -238,16 +268,25 @@ export default function Inventory() {
           
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[10px] font-bold text-gray-400 tracking-wider uppercase mr-2">Brand / Category:</span>
-            <button className="px-3 py-1 bg-[#006241] text-white text-xs font-bold rounded-full">All Brands (62)</button>
-            <button className="px-3 py-1 bg-[#eef7f2] text-[#0d5236] text-xs font-bold rounded-full">Gillette (23)</button>
-            <button className="px-3 py-1 bg-[#eef7f2] text-[#0d5236] text-xs font-bold rounded-full">Olay (4)</button>
-            <button className="px-3 py-1 bg-[#eef7f2] text-[#0d5236] text-xs font-bold rounded-full">Head & Shoulders (7)</button>
-            <button className="px-3 py-1 bg-[#eef7f2] text-[#0d5236] text-xs font-bold rounded-full">Pampers (13)</button>
-            <button className="px-3 py-1 bg-[#eef7f2] text-[#0d5236] text-xs font-bold rounded-full">Vicks (3)</button>
-            <button className="px-3 py-1 bg-[#eef7f2] text-[#0d5236] text-xs font-bold rounded-full">Whisper (1)</button>
-            <button className="px-3 py-1 bg-[#eef7f2] text-[#0d5236] text-xs font-bold rounded-full">Tide (1)</button>
-            <button className="px-3 py-1 bg-[#eef7f2] text-[#0d5236] text-xs font-bold rounded-full">Mabroc (2)</button>
-            <button className="px-3 py-1 bg-[#eef7f2] text-[#0d5236] text-xs font-bold rounded-full">Sun Up (7)</button>
+            {brandsList.map((brand) => {
+              const count = brand === 'All'
+                ? skuData.length
+                : skuData.filter((i) => i.brand === brand).length;
+              const isSelected = selectedBrand === brand;
+              return (
+                <button
+                  key={brand}
+                  onClick={() => setSelectedBrand(brand)}
+                  className={`px-3 py-1 text-xs font-bold rounded-full transition-colors ${
+                    isSelected 
+                      ? 'bg-[#006241] text-white' 
+                      : 'bg-[#eef7f2] text-[#0d5236] hover:bg-[#d1f0e4]'
+                  }`}
+                >
+                  {brand === 'All' ? `All Brands (${count})` : `${brand} (${count})`}
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -268,94 +307,124 @@ export default function Inventory() {
               </tr>
             </thead>
             <tbody className="text-sm divide-y divide-gray-100">
-              {SKUData.map((item, idx) => (
-                <tr key={idx} className="hover:bg-gray-50">
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#eef7f2] rounded border border-[#bce3d0] flex items-center justify-center">
-                        {/* Barcode-like visual */}
-                        <div className="flex gap-0.5 h-6">
-                          <div className="w-1 bg-[#10251d]"></div>
-                          <div className="w-0.5 bg-[#10251d]"></div>
-                          <div className="w-1 bg-[#10251d]"></div>
-                          <div className="w-1.5 bg-[#10251d]"></div>
-                          <div className="w-0.5 bg-[#10251d]"></div>
-                        </div>
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="font-bold text-[#10251d]">{item.name}</span>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[10px] font-mono bg-[#eef6f1] text-[#006241] px-1.5 py-0.5 rounded">{item.id}</span>
-                          <span className="text-xs text-gray-500">&bull; {item.desc}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-[#10251d]">{item.brand}</span>
-                      <div className="flex items-center gap-1 mt-0.5 text-gray-500 text-xs">
-                        <SVG.Box /> {item.bin}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex flex-col gap-1">
-                      <div className="flex justify-between items-end">
-                        <span className="font-bold text-[#006241]">{item.avail} Avail</span>
-                        <span className="text-xs text-gray-500">{item.total} total</span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-1.5">
-                        <div className="bg-[#006241] h-1.5 rounded-full" style={{width: `${(item.avail / item.total) * 100}%`}}></div>
-                      </div>
-                      <span className="text-[10px] text-gray-400">{item.reserved} units reserved</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-[#10251d]">Rs. {item.wholesale}</span>
-                      <span className="text-[10px] text-gray-500 uppercase tracking-wide">Wholesale</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <div className="flex flex-col items-end">
-                      <span className="font-bold text-[#10251d]">Rs. {item.retail}</span>
-                      <span className="text-[10px] font-bold text-[#00c993] bg-[#eef7f2] px-1 rounded mt-0.5">{item.margin}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-[#10251d]">Rs. {item.valuation}</span>
-                      <span className="text-[10px] text-gray-500 uppercase tracking-wide">Total Value</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex flex-col gap-1 items-start">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#006241] bg-[#eef7f2] px-2 py-0.5 rounded-full">
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#00c993]"></div> {item.health}
-                      </span>
-                      <span className="text-xs text-gray-500">Min Safe: {item.minSafe}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex flex-col">
-                      <span className="font-bold text-[#10251d]">Lot {item.lot}</span>
-                      <span className="text-xs text-gray-500">{item.expiry}</span>
-                      <span className="text-[10px] text-gray-400">({item.status})</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
+              {isLoading && skuData.length === 0 ? (
+                <tr>
+                  <td colSpan="9" className="px-4 py-8 text-center text-gray-500">
                     <div className="flex items-center justify-center gap-2">
-                      <button className="flex items-center gap-1 px-2 py-1 bg-[#eef7f2] text-[#0d5236] rounded text-xs font-bold border border-[#bce3d0] hover:bg-[#d1f0e4]">
-                        <SVG.Edit /> Edit
-                      </button>
-                      <button className="p-1 text-gray-400 hover:text-gray-600 bg-gray-50 border border-gray-200 rounded">
-                        <SVG.ExternalLink />
-                      </button>
+                      <div className="w-4 h-4 border-2 border-[#006241] border-t-transparent rounded-full animate-spin"></div>
+                      Fetching latest inventory from backend...
                     </div>
                   </td>
                 </tr>
-              ))}
+              ) : filteredData.length === 0 ? (
+                <tr>
+                  <td colSpan="9" className="px-4 py-8 text-center text-gray-500 font-medium">
+                    No items found matching "{searchTerm}" {selectedBrand !== 'All' ? `in ${selectedBrand}` : ''}.
+                  </td>
+                </tr>
+              ) : (
+                filteredData.map((item, idx) => {
+                  const avail = item.avail ?? 0;
+                  const total = item.total ?? avail ?? 1;
+                  const pct = total > 0 ? Math.min(100, Math.round((avail / total) * 100)) : 0;
+                  const itemValuation = typeof item.valuation === 'number'
+                    ? item.valuation.toLocaleString('en-US', { minimumFractionDigits: 2 })
+                    : (item.valuation || ((avail * (parseFloat(item.wholesale) || 0)).toLocaleString('en-US', { minimumFractionDigits: 2 }) || '0.00'));
+
+                  return (
+                    <tr key={item.id || idx} className="hover:bg-gray-50">
+                      <td className="px-4 py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-[#eef7f2] rounded border border-[#bce3d0] flex items-center justify-center">
+                            {/* Barcode-like visual */}
+                            <div className="flex gap-0.5 h-6">
+                              <div className="w-1 bg-[#10251d]"></div>
+                              <div className="w-0.5 bg-[#10251d]"></div>
+                              <div className="w-1 bg-[#10251d]"></div>
+                              <div className="w-1.5 bg-[#10251d]"></div>
+                              <div className="w-0.5 bg-[#10251d]"></div>
+                            </div>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-[#10251d]">{item.name || 'Unnamed Item'}</span>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-[10px] font-mono bg-[#eef6f1] text-[#006241] px-1.5 py-0.5 rounded">{item.id}</span>
+                              {item.desc && <span className="text-xs text-gray-500">&bull; {item.desc}</span>}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-[#10251d]">{item.brand || 'General'}</span>
+                          <div className="flex items-center gap-1 mt-0.5 text-gray-500 text-xs">
+                            <SVG.Box /> {item.bin || 'Unassigned'}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex justify-between items-end">
+                            <span className="font-bold text-[#006241]">{avail} Avail</span>
+                            <span className="text-xs text-gray-500">{total} total</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-1.5">
+                            <div className="bg-[#006241] h-1.5 rounded-full" style={{ width: `${pct}%` }}></div>
+                          </div>
+                          <span className="text-[10px] text-gray-400">{item.reserved ?? 0} units reserved</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-[#10251d]">Rs. {item.wholesale || '0.00'}</span>
+                          <span className="text-[10px] text-gray-500 uppercase tracking-wide">Wholesale</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <div className="flex flex-col items-end">
+                          <span className="font-bold text-[#10251d]">Rs. {item.retail || '0.00'}</span>
+                          {item.margin && (
+                            <span className="text-[10px] font-bold text-[#00c993] bg-[#eef7f2] px-1 rounded mt-0.5">
+                              {item.margin}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-[#10251d]">Rs. {itemValuation}</span>
+                          <span className="text-[10px] text-gray-500 uppercase tracking-wide">Total Value</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col gap-1 items-start">
+                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#006241] bg-[#eef7f2] px-2 py-0.5 rounded-full">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#00c993]"></div> {item.health || 'Healthy'}
+                          </span>
+                          <span className="text-xs text-gray-500">Min Safe: {item.minSafe ?? 0}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-[#10251d]">Lot {item.lot || 'N/A'}</span>
+                          <span className="text-xs text-gray-500">{item.expiry || '-'}</span>
+                          {item.status && <span className="text-[10px] text-gray-400">({item.status})</span>}
+                        </div>
+                      </td>
+                      <td className="px-4 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <button className="flex items-center gap-1 px-2 py-1 bg-[#eef7f2] text-[#0d5236] rounded text-xs font-bold border border-[#bce3d0] hover:bg-[#d1f0e4]">
+                            <SVG.Edit /> Edit
+                          </button>
+                          <button className="p-1 text-gray-400 hover:text-gray-600 bg-gray-50 border border-gray-200 rounded">
+                            <SVG.ExternalLink />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
@@ -444,6 +513,31 @@ export default function Inventory() {
           </div>
         </div>
       </div>
+
+      {/* Modal Forms */}
+      {isAddSkuOpen && (
+        <AddSKU
+          onClose={() => setIsAddSkuOpen(false)}
+          onSkuAdded={(newSku) => setSkuData((prev) => [newSku, ...prev])}
+        />
+      )}
+      {isAdjustOpen && (
+        <BatchAdjustStock
+          items={skuData}
+          onClose={() => setIsAdjustOpen(false)}
+          onAdjusted={(skuId, delta) => {
+            setSkuData((prev) =>
+              prev.map((item) => {
+                if (item.id === skuId) {
+                  const newAvail = Math.max(0, (item.avail || 0) + delta);
+                  return { ...item, avail: newAvail };
+                }
+                return item;
+              })
+            );
+          }}
+        />
+      )}
     </div>
   );
 }
