@@ -262,10 +262,7 @@ export default function Login() {
 
                 <button
                   type="button"
-                  onClick={() => {
-                    setMode('signup');
-                    setNotice('');
-                  }}
+                  onClick={() => navigate('/signup')}
                   className={tab(mode === 'signup')}
                 >
                   Sign Up (Register)

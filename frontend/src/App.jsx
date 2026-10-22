@@ -8,6 +8,7 @@ import Login from './pages/login.jsx';
 import Inventory from './pages/Inventory.jsx';
 import POSOrderEntry from './pages/POSOrderEntry.jsx';
 import UserRoles from './pages/UserROles.jsx';
+import SignUp from './pages/SignUp.jsx';
 
 // Shared layout for dashboard pages
 function DashboardLayout({ children }) {
@@ -73,6 +74,7 @@ function App() {
         path="*"
         element={<Navigate to="/login" replace />}
       />
+      <Route path="/signup" element={<SignUp />} />
     </Routes>
   );
 }
