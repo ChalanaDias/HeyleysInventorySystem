@@ -4,6 +4,7 @@ import Header from './components/Header.jsx';
 import NavBar from './components/NavBar.jsx';
 
 import Login from './pages/login.jsx';
+import SignUp from './pages/SignUp.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Inventory from './pages/Inventory.jsx';
 import Returns from './pages/Returns.jsx';
@@ -35,6 +36,9 @@ function App() {
 
       {/* Login uses its own layout and does not show the app navigation. */}
       <Route path="/login" element={<Login />} />
+      
+      {/* Sign Up page */}
+      <Route path="/signup" element={<SignUp />} />
 
       {/* Dashboard page */}
       <Route
