@@ -1,0 +1,244 @@
+.po-modal-backdrop {
+  /* Dim and blur the page behind the dialog without blurring its contents. */
+  display: flex;
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 20px;
+  background: rgb(5 27 19 / 48%);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+}
+
+.po-modal {
+  /* Constrain the dialog and allow its content to scroll on short screens. */
+  width: min(100%, 640px);
+  max-height: min(100%, 760px);
+  overflow-y: auto;
+  padding: 28px 24px 0;
+  border: 1px solid #d9eae1;
+  border-radius: 14px;
+  color: #10251d;
+  background: #fff;
+  box-shadow: 0 24px 70px rgb(4 28 19 / 25%);
+}
+
+.po-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-bottom: 19px;
+  border-bottom: 1px solid #e4eee8;
+}
+
+.po-modal-icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 11px;
+  color: #fff;
+  background: #006241;
+}
+
+.po-modal-heading {
+  min-width: 0;
+  flex: 1;
+}
+
+.po-modal-heading h2,
+.po-modal-heading p {
+  margin: 0;
+}
+
+.po-modal-heading h2 {
+  color: #10251d;
+  font-size: 21px;
+  font-weight: 720;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+}
+
+.po-modal-heading p {
+  margin-top: 4px;
+  color: #587d6c;
+  font-size: 13px;
+}
+
+.po-modal-close {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  color: #587d6c;
+  background: transparent;
+  cursor: pointer;
+}
+
+.po-modal-close:hover {
+  color: #10251d;
+  background: #effbf4;
+}
+
+.po-form-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 19px 18px;
+  padding: 21px 0 20px;
+}
+
+.po-field {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  color: #456357;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.po-field b {
+  color: #a31e28;
+}
+
+.po-field-full {
+  grid-column: 1 / -1;
+}
+
+.po-field input,
+.po-field select {
+  width: 100%;
+  min-width: 0;
+  height: 45px;
+  padding: 0 14px;
+  border: 1px solid #c9f3dc;
+  border-radius: 10px;
+  outline: none;
+  color: #10251d;
+  background: #effbf4;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 450;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.po-field input:focus,
+.po-field select:focus {
+  border-color: #00845a;
+  box-shadow: 0 0 0 3px rgb(0 132 90 / 12%);
+}
+
+.po-form-notice {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border: 1px solid #f0d9a3;
+  border-radius: 8px;
+  color: #78530a;
+  background: #fff8e6;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.po-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  padding: 15px 0 20px;
+  border-top: 1px solid #e4eee8;
+}
+
+.po-cancel-button,
+.po-submit-button {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 0 18px;
+  border: 1px solid #c9f3dc;
+  border-radius: 10px;
+  color: #10251d;
+  background: #effbf4;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.po-submit-button {
+  min-width: 250px;
+  border-color: #006241;
+  color: #fff;
+  background: #006241;
+}
+
+.po-cancel-button:hover {
+  background: #e5f5ed;
+}
+
+.po-submit-button:hover {
+  background: #004f35;
+}
+
+.po-modal-close:focus-visible,
+.po-cancel-button:focus-visible,
+.po-submit-button:focus-visible {
+  outline: 3px solid rgb(0 132 90 / 35%);
+  outline-offset: 2px;
+}
+
+@media (max-width: 520px) {
+  /* Stack form fields and keep the dialog usable on narrow screens. */
+  .po-modal-backdrop {
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .po-modal {
+    max-height: calc(100vh - 20px);
+    padding: 18px 16px 0;
+    border-radius: 12px;
+  }
+
+  .po-modal-heading h2 {
+    font-size: 17px;
+  }
+
+  .po-modal-heading p {
+    font-size: 11px;
+  }
+
+  .po-form-fields {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 17px 0;
+  }
+
+  .po-field-full {
+    grid-column: auto;
+  }
+
+  .po-form-footer {
+    gap: 9px;
+  }
+
+  .po-cancel-button,
+  .po-submit-button {
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .po-submit-button {
+    min-width: 0;
+    flex: 1;
+  }
+}

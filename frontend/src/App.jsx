@@ -1,23 +1,27 @@
-
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Header from './components/Header.jsx';
 import NavBar from './components/NavBar.jsx';
 
 import Login from './pages/login.jsx';
+import SignUp from './pages/SignUp.jsx';
+import Dashboard from './pages/Dashboard.jsx';
 import Inventory from './pages/Inventory.jsx';
+import Returns from './pages/Returns.jsx';
+import PurchaseOrder from './pages/PurchaseOrder.jsx';
 import POSOrderEntry from './pages/POSOrderEntry.jsx';
 import UserRoles from './pages/UserROles.jsx';
-import SignUp from './pages/SignUp.jsx';
+import Settings from './pages/Settings.jsx';
 
-// Shared layout for dashboard pages
-function DashboardLayout({ children }) {
+// Reuse the existing fixed header and navigation on the app pages.
+function AppLayout({ children }) {
   return (
     <div className="flex w-full min-h-screen bg-[#f4f8f5]">
       <Header />
       <NavBar />
 
-      <main className="flex-1 ml-[228px] max-[700px]:ml-[64px] min-w-0">
+      {/* Match the fixed desktop sidebar; switch to its compact 64px mobile width. */}
+      <main className="app-main flex-1 ml-[260px] max-[700px]:ml-[64px] min-w-0 min-[1600px]:ml-[325px]">
         {children}
       </main>
     </div>
@@ -27,25 +31,52 @@ function DashboardLayout({ children }) {
 function App() {
   return (
     <Routes>
-      {/* Default page */}
-      <Route
-        path="/"
-        element={<Navigate to="/login" replace />}
-      />
+      {/* Keep the login page as the initial destination. */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
 
-      {/* Login page */}
+      {/* Login uses its own layout and does not show the app navigation. */}
+      <Route path="/login" element={<Login />} />
+      
+      {/* Sign Up page */}
+      <Route path="/signup" element={<SignUp />} />
+
+      {/* Dashboard page */}
       <Route
-        path="/login"
-        element={<Login />}
+        path="/dashboard"
+        element={
+          <AppLayout>
+            <Dashboard />
+          </AppLayout>
+        }
       />
 
       {/* Inventory page */}
       <Route
         path="/inventory"
         element={
-          <DashboardLayout>
+          <AppLayout>
             <Inventory />
-          </DashboardLayout>
+          </AppLayout>
+        }
+      />
+
+      {/* Purchase Orders page */}
+      <Route
+        path="/purchase-orders"
+        element={
+          <AppLayout>
+            <PurchaseOrder />
+          </AppLayout>
+        }
+      />
+
+      {/* Returns and RMA tickets page */}
+      <Route
+        path="/returns"
+        element={
+          <AppLayout>
+            <Returns />
+          </AppLayout>
         }
       />
 
@@ -53,9 +84,9 @@ function App() {
       <Route
         path="/pos-order-entry"
         element={
-          <DashboardLayout>
+          <AppLayout>
             <POSOrderEntry />
-          </DashboardLayout>
+          </AppLayout>
         }
       />
 
@@ -63,18 +94,24 @@ function App() {
       <Route
         path="/user-roles"
         element={
-          <DashboardLayout>
+          <AppLayout>
             <UserRoles />
-          </DashboardLayout>
+          </AppLayout>
         }
       />
 
-      {/* Unknown pages */}
+      {/* Settings page */}
       <Route
-        path="*"
-        element={<Navigate to="/login" replace />}
+        path="/settings"
+        element={
+          <AppLayout>
+            <Settings />
+          </AppLayout>
+        }
       />
-      <Route path="/signup" element={<SignUp />} />
+
+      {/* Redirect unknown URLs to the login page. */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
